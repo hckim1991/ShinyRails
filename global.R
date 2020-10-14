@@ -4,6 +4,7 @@ library(quantmod)
 library(shiny)
 library(shinydashboard)
 library(dashboardthemes)
+library(scales)
 
 #Read carload data
 carloads = read.csv('C:/Users/hk486/OneDrive/Desktop/NYDSA/Bootcamp/Projects/Shiny/Rails/EP724 Data.csv')

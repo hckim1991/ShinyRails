@@ -37,15 +37,21 @@ dashboardPage(
               fluidRow("Directly plotting rail carloads vs. GDP shows a less clear relationship as below but 
                        this is due to the short timeframe (only 13 quarterly data used below). With more data,
                        there will be a clear relationship."),
-              fluidRow(box(plotOutput('CarloadGDP'), width = 12))
+              fluidRow(box(plotOutput('CarloadGDP'), width = 12), 
+                       br()),
+              fluidRow(h2("Goal"), 
+                       "Given the importance of rails to the US economy, it is no surprise that the rail stocks
+                       have a wide investor base.", tags$u(tags$b("The goal of this project is to identify trading 
+                       opportunities based on the relationship between carloads and rail stock prices under 
+                       different macro environment.")), "This is a common analysis hedge funds do on the rails
+                       and this web app will automate the analysis.")
               ),
       tabItem(tabName = "rails", 
-              fluidRow(
-                selectizeInput("rail_selected", 
-                               "Which Rail? (BNSF is private so will only show carloads)", 
-                               unique(df_main$Name))),
-              fluidRow(
-                plotOutput('RelToSelf')),
+              fluidRow(selectizeInput("rail_selected", 
+                                      "Which Rail? (BNSF is private so will only show carloads)", 
+                                      unique(df_main$Name))),
+              fluidRow(h2("Single Rail Analysis"), 
+                       box(plotOutput('RelToSelf'), width = 12)),
               fluidRow(
                 plotOutput('RelToIYT')),
               fluidRow(
