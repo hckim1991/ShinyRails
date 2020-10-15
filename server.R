@@ -76,9 +76,193 @@ function(input, output) {
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Carloads (Red) vs. Stock Price (Blue)')
+      ggtitle('Carloads (Red) vs. Stock Price (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred')
     )
   
   #Rails section: Rail analysis vs. IYT
+  output$RelToIYT = renderPlot(
+    df_reactive() %>%
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      #axis transformation (more complicated since it's reactive but the concept is the same)
+      geom_line(aes(y = (Relative.To.IYT - min(Relative.To.IYT, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+                        (max(Relative.To.IYT, na.rm = T) - min(Relative.To.IYT, na.rm = T))) + 
+                        (min(Carloads) - min(Relative.To.IYT, na.rm = T)),
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'Total Carloads',
+        labels = scientific,
+        #axis transformation (more complicated since it's reactive but the concept is the same)
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                  (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))) + 
+                              min(df_reactive()$Relative.To.IYT, na.rm = T) - 
+                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.IYT, na.rm = T)) / 
+                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                 (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))), 
+                            name = 'Stock Price / IYT')
+      ) +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('Carloads (Red) vs. Stock Price/IYT (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred')
+    )
   
+  #Rails section: Rail analysis vs. XLI
+  output$RelToXLI = renderPlot(
+    df_reactive() %>%
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      #axis transformation (more complicated since it's reactive but the concept is the same)
+      geom_line(aes(y = (Relative.To.XLI - min(Relative.To.XLI, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+                        (max(Relative.To.XLI, na.rm = T) - min(Relative.To.XLI, na.rm = T))) + 
+                        (min(Carloads) - min(Relative.To.XLI, na.rm = T)),
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'Total Carloads',
+        labels = scientific,
+        #axis transformation (more complicated since it's reactive but the concept is the same)
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                  (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))) + 
+                              min(df_reactive()$Relative.To.XLI, na.rm = T) - 
+                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.XLI, na.rm = T)) / 
+                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                 (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))), 
+                            name = 'Stock Price / XLI')
+      ) +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('Carloads (Red) vs. Stock Price/XLI (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred')
+    )
+  
+  #Rails section: Rail analysis vs. S&P500
+  output$RelToSPY = renderPlot(
+    df_reactive() %>%
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      #axis transformation (more complicated since it's reactive but the concept is the same)
+      geom_line(aes(y = (Relative.To.SPY - min(Relative.To.SPY, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+                        (max(Relative.To.SPY, na.rm = T) - min(Relative.To.SPY, na.rm = T))) + 
+                        (min(Carloads) - min(Relative.To.SPY, na.rm = T)),
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'Total Carloads',
+        labels = scientific,
+        #axis transformation (more complicated since it's reactive but the concept is the same)
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                  (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))) + 
+                              min(df_reactive()$Relative.To.SPY, na.rm = T) - 
+                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.SPY, na.rm = T)) / 
+                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                                 (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))), 
+                            name = 'Stock Price / S&P500')
+      ) +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('Carloads (Red) vs. Stock Price/S&P500 (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               alpha = 0.2, fill = 'darkred')
+    )
+  
+  #USCAD section: US rails vs. Canadian rails
+  output$uscad.analysis = renderPlot(
+    df_USCAD %>%
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Relative.Carloads, group = 1), color = 'red', size = 1.5) +
+      #axis transformation 
+      geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc + translation_uc,
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'US carloads / Canadian carloads',
+        #axis transformation 
+        sec.axis = sec_axis(~./scale_uc + min(df_USCAD$Relative.Price, na.rm = T) - translation_uc / scale_uc, 
+                            name = 'US Rail Stock Price / Canadian Rail Stock Price')
+      ) +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('Relative Carloads (Red) vs. Relative Stock Price (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_USCAD$Date),
+               ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
+               alpha = 0.2, fill = 'darkred')
+    )
   }

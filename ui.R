@@ -50,18 +50,25 @@ dashboardPage(
               fluidRow(selectizeInput("rail_selected", 
                                       "Which Rail? (BNSF is private so will only show carloads)", 
                                       unique(df_main$Name))),
-              fluidRow(h2("Single Rail Analysis"), 
+              fluidRow(h2("Single Rail Analysis"),
+                       "Green area: ISM >= 50, Red area: ISM < 50",
                        box(plotOutput('RelToSelf'), width = 12)),
-              fluidRow(
-                plotOutput('RelToIYT')),
-              fluidRow(
-                plotOutput('RelToXLI')),
-              fluidRow(
-                plotOutput('RelToSPY'))
+              fluidRow(h2("Vs. IYT (transportation index)"),
+                       "Green area: ISM >= 50, Red area: ISM < 50",
+                       box(plotOutput('RelToIYT'), width = 12)),
+              fluidRow(h2("Vs. XLI (industrials index)"),
+                       "Green area: ISM >= 50, Red area: ISM < 50",
+                       box(plotOutput('RelToXLI'), width = 12)),
+              fluidRow(h2("Vs. S&P500"),
+                       "Green area: ISM >= 50, Red area: ISM < 50",
+                       box(plotOutput('RelToSPY'), width = 12))
               ), 
       tabItem(tabName = "uscad", 
-              fluidRow(
-                plotOutput('uscad.analysis'))
+              fluidRow(h2("US rails (CSX, NSC, UNP) vs. Canadian rails (CP, CNI)"),
+                       "Green area: ISM >= 50, Red area: ISM < 50",
+                       br(),
+                       "Caveat: Canadian rail volumes only reflect the US portion.",
+                       box(plotOutput('uscad.analysis'), width = 12))
               ),
       tabItem(tabName = "conclusion", fluidRow("hello")
               ),

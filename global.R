@@ -7,6 +7,7 @@ library(dashboardthemes)
 library(scales)
 
 #Read carload data
+#Source: https://www.stb.gov/stb/railserviceissues/rail_service_reports.html
 carloads = read.csv('C:/Users/hk486/OneDrive/Desktop/NYDSA/Bootcamp/Projects/Shiny/Rails/EP724 Data.csv')
 
 #Convert columns do dates
@@ -121,6 +122,11 @@ df_USCAD = df_USCAD %>%
   mutate(Relative.Carloads = Carloads.x / Carloads.y, Relative.Price = Price.x / Price.y) %>%
   select(Date, Relative.Carloads, Relative.Price)
 
+#Variables to scale the second axis of US rails vs. Canadian rails analysis
+scale_uc = (max(df_USCAD$Relative.Carloads) - min(df_USCAD$Relative.Carloads)) / 
+  (max(df_USCAD$Relative.Price, na.rm = T) - min(df_USCAD$Relative.Price, na.rm = T))  
+translation_uc = min(df_USCAD$Relative.Carloads) - min(df_USCAD$Relative.Price, na.rm = T)
+
 #Pull GDP data for the Intro section and cbind with carloads
 getSymbols('GDP', src = 'FRED')
 GDP = as.data.frame(GDP)
@@ -166,7 +172,10 @@ carloads_ISM = carloads %>% rownames_to_column() %>%
   summarize(Total = sum(Total)) %>%
   inner_join(ISM, by = 'Date')
 
-#Variables to scale the second axis of carloads vs. GDP plot
+ISM_bull = ISM %>% filter(Last >= 50) %>% select(Date)
+ISM_bear = ISM %>% filter(Last < 50) %>% select(Date)
+
+#Variables to scale the second axis of carloads vs. ISM plot
 scale_ci = (max(carloads_ISM[-1, ]$Total) - min(carloads_ISM[-1, ]$Total)) / 
   (max(carloads_ISM[-1, ]$Last) - min(carloads_ISM[-1, ]$Last))  
 translation_ci = min(carloads_ISM[-1, ]$Total) - min(carloads_ISM[-1, ]$Last)
