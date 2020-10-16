@@ -1,5 +1,5 @@
 
-function(input, output) {
+function(input, output, session) {
   #Intro section: Rail carload mix plot
   output$rails = renderPlot(
     carloads_by_type %>%
@@ -180,6 +180,8 @@ function(input, output) {
                alpha = 0.2, fill = 'darkred')
     )
   
+  observeEvent(input$hideshow, toggle("RelToIYT"))
+  
   #Rails section: Rail analysis vs. XLI
   output$RelToXLI = renderPlot(
     df_reactive() %>%
@@ -225,6 +227,8 @@ function(input, output) {
                ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred')
     )
+  
+  observeEvent(input$hideshow, toggle("RelToXLI"))
   
   #Rails section: Rail analysis vs. S&P500
   output$RelToSPY = renderPlot(

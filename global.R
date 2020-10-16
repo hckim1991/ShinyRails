@@ -7,6 +7,7 @@ library(dashboardthemes)
 library(scales)
 library(RColorBrewer)
 library(zoo)
+library(shinyjs)
 
 #Read carload data
 #Source: https://www.stb.gov/stb/railserviceissues/rail_service_reports.html

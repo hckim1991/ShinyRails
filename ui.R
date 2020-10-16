@@ -73,6 +73,10 @@ dashboardPage(
                                                  c(1, 4, 12, 52))
                                   ), 
                            width = 12
+                           ), 
+                       box(useShinyjs(),
+                           checkboxInput('hideshow', 'Show IYT and XLI Analysis', value = F), 
+                           width = 12
                            )
                        ),
               fluidRow(h2("Single Rail Analysis"),
