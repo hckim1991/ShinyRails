@@ -115,6 +115,12 @@ for (i in seq(2, ncol(stocks), 4)) {
 
 #Join stocks_final with carloads_final 
 df_main = left_join(carloads_final, stocks_final, by = c('Name', 'Date'))
+df_main_reactive = df_main %>%
+  rename(Carloads.1 = Carloads) %>%
+  group_by(Name) %>%
+  mutate(Carloads.4 = rollmean(Carloads.1, k = 4, fill = NA, align = 'right'), 
+         Carloads.12 = rollmean(Carloads.1, k = 12, fill = NA, align = 'right'),
+         Carloads.52 = rollmean(Carloads.1, k = 52, fill = NA, align = 'right'))
 
 #Create data frames for US vs. Canadian rail analysis
 temp_CSX = df_main %>% filter(Name == 'CSX') %>% select(1, 3:4)

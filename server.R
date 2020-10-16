@@ -82,8 +82,11 @@ function(input, output) {
   
   #Create a reactive df for the Rails section
   df_reactive = reactive(
-    df_main %>%
-      filter(Name == input$rail_selected)
+    df_main_reactive %>%
+      filter(Name == input$rail_selected) %>%
+      select('Date', 'Name', str_c('Carloads.', as.character(input$ma)), 'Price', 'Relative.To.IYT', 
+             'Relative.To.XLI', 'Relative.To.SPY') %>%
+      rename(Carloads = 3)
   )
   
   #Rails section: Single rail analysis
@@ -92,18 +95,18 @@ function(input, output) {
       ggplot(aes(x = Date)) + 
       geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
-      geom_line(aes(y = (Price - min(Price, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
-                      (max(Price, na.rm = T) - min(Price, na.rm = T))) + min(Carloads),
+      geom_line(aes(y = (Price - min(Price, na.rm = T)) * ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
+                      (max(Price, na.rm = T) - min(Price, na.rm = T))) + min(Carloads, na.rm = T),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
         labels = scientific,
         #axis transformation (more complicated since it's reactive but the concept is the same)
-        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                   (max(df_reactive()$Price, na.rm = T) - min(df_reactive()$Price, na.rm = T))) + 
                               min(df_reactive()$Price, na.rm = T) - 
-                              min(df_reactive()$Carloads) / 
-                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                              min(df_reactive()$Carloads, na.rm = T) / 
+                              ((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                  (max(df_reactive()$Price, na.rm = T) - min(df_reactive()$Price, na.rm = T))), 
                             name = 'Stock Price', 
                             labels = dollar_format(accuracy = 0.01))
@@ -115,19 +118,19 @@ function(input, output) {
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       ggtitle('Carloads (Red) vs. Stock Price (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
       annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred') +
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred')
   )
   
@@ -137,19 +140,20 @@ function(input, output) {
       ggplot(aes(x = Date)) + 
       geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
-      geom_line(aes(y = (Relative.To.IYT - min(Relative.To.IYT, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+      geom_line(aes(y = (Relative.To.IYT - min(Relative.To.IYT, na.rm = T)) *
+                      ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
                         (max(Relative.To.IYT, na.rm = T) - min(Relative.To.IYT, na.rm = T))) + 
-                        min(Carloads),
+                        min(Carloads, na.rm = T),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
         labels = scientific,
         #axis transformation (more complicated since it's reactive but the concept is the same)
-        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                   (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))) + 
                               min(df_reactive()$Relative.To.IYT, na.rm = T) - 
-                              min(df_reactive()$Carloads) / 
-                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                              min(df_reactive()$Carloads, na.rm = T) / 
+                              ((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                  (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))), 
                             name = 'Stock Price / IYT')
       ) +
@@ -160,19 +164,19 @@ function(input, output) {
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       ggtitle('Carloads (Red) vs. Stock Price/IYT (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
       annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred') +
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred')
     )
   
@@ -182,19 +186,20 @@ function(input, output) {
       ggplot(aes(x = Date)) + 
       geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
-      geom_line(aes(y = (Relative.To.XLI - min(Relative.To.XLI, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+      geom_line(aes(y = (Relative.To.XLI - min(Relative.To.XLI, na.rm = T)) * 
+                      ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
                         (max(Relative.To.XLI, na.rm = T) - min(Relative.To.XLI, na.rm = T))) + 
-                        min(Carloads),
+                        min(Carloads, na.rm = T),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
         labels = scientific,
         #axis transformation (more complicated since it's reactive but the concept is the same)
-        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                   (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))) + 
                               min(df_reactive()$Relative.To.XLI, na.rm = T) - 
-                              min(df_reactive()$Carloads) / 
-                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                              min(df_reactive()$Carloads, na.rm = T) / 
+                              ((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                  (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))), 
                             name = 'Stock Price / XLI')
       ) +
@@ -205,19 +210,19 @@ function(input, output) {
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       ggtitle('Carloads (Red) vs. Stock Price/XLI (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
       annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred') +
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred')
     )
   
@@ -227,19 +232,20 @@ function(input, output) {
       ggplot(aes(x = Date)) + 
       geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
-      geom_line(aes(y = (Relative.To.SPY - min(Relative.To.SPY, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
+      geom_line(aes(y = (Relative.To.SPY - min(Relative.To.SPY, na.rm = T)) * 
+                      ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
                         (max(Relative.To.SPY, na.rm = T) - min(Relative.To.SPY, na.rm = T))) + 
-                        min(Carloads),
+                        min(Carloads, na.rm = T),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
         labels = scientific,
         #axis transformation (more complicated since it's reactive but the concept is the same)
-        sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+        sec.axis = sec_axis(~./((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                   (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))) + 
                               min(df_reactive()$Relative.To.SPY, na.rm = T) - 
-                              min(df_reactive()$Carloads) / 
-                              ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
+                              min(df_reactive()$Carloads, na.rm = T) / 
+                              ((max(df_reactive()$Carloads, na.rm = T) - min(df_reactive()$Carloads, na.rm = T)) / 
                                  (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))), 
                             name = 'Stock Price / S&P500')
       ) +
@@ -250,19 +256,19 @@ function(input, output) {
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       ggtitle('Carloads (Red) vs. Stock Price/S&P500 (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
       annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_reactive()$Date),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') +
       annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred') +
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
-               ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
+               ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkred')
     )
   
