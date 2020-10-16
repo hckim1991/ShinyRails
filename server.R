@@ -1,5 +1,21 @@
 
 function(input, output) {
+  #Intro section: Rail carload plot
+  output$rails = renderPlot(
+    carloads_by_type %>%
+      ggplot(aes(x = 1, y = Total)) +
+      geom_col(aes(fill = Variable), position = 'fill', color = 'black') +
+      scale_y_continuous(name = '% of Total Carloads', labels = percent) +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_blank(), plot.title = element_text(size = 20)) +
+      xlab(NULL) +
+      labs(fill = 'Carload Type') +
+      scale_color_gradient(low = 'red', high = 'yellow') +
+      ggtitle('Rail Carload Mix')
+  )
+  
   #Intro section: Rail carloads. vs. ISM plot
   output$CarloadISM = renderPlot(
     carloads_ISM[-1, ] %>% #Skip 1st row since March 2017 has incomplete data. 
@@ -41,6 +57,27 @@ function(input, output) {
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       ggtitle('Rail Carloads (Red) vs. US GDP (Blue)')
+    )
+  
+  #Intro section: ISM vs. GDP
+  output$ISMGDP = renderPlot(
+    ISMGDP %>%
+      ggplot(aes(x = Date)) +
+      geom_line(aes(y = ISM, group = 1), color = 'red', size = 1.5) +
+      #axis transformation
+      geom_line(aes(y = (GDP - min(GDP)) * scale_ig + translation_ig,
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'ISM',
+        #axis transformation
+        sec.axis = sec_axis(~./scale_ig + min(ISMGDP$GDP) - translation_ig / scale_ig, 
+                            name = 'US GDP ($ bn)')
+      ) +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('ISM (Red) vs. US GDP (Blue)')
     )
   
   #Create a reactive df for the Rails section
@@ -276,6 +313,7 @@ function(input, output) {
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'YoY change in US carloads - YoY change in Canadian carloads',
+        labels = percent_format(accuracy = 0.1), 
         #axis transformation 
         sec.axis = sec_axis(~./scale_uc2 + min(df_USCAD$Relative.Price, na.rm = T) - translation_uc2 / scale_uc2, 
                             name = 'US Rail Stock Price / Canadian Rail Stock Price')
@@ -317,6 +355,7 @@ function(input, output) {
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
       labs(color = 'Stock') +
+      scale_color_brewer(palette = 'Accent') +
       ggtitle('Rail Stock Prices Relative to S&P 500 Over Time')
     )
   }

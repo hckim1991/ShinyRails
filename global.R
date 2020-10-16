@@ -5,6 +5,7 @@ library(shiny)
 library(shinydashboard)
 library(dashboardthemes)
 library(scales)
+library(RColorBrewer)
 
 #Read carload data
 #Source: https://www.stb.gov/stb/railserviceissues/rail_service_reports.html
@@ -24,37 +25,53 @@ for (i in 7:ncol(carloads)) {
 }
 
 #Filter for carloads, sum up carloads by railroad, transpose, then clean up column names
-carloads = carloads %>%
+carloads_temp = carloads %>%
   filter(Measure == 'Weekly Carloads By 22 Commodity Categories' & carloads$Sub.Variable == 'Total') %>%
   group_by(Name) %>%
   summarize_at(vars(6:(ncol(carloads)-1)), sum) %>%
   t()
 
-colnames(carloads) = carloads[1, ]
-colnames(carloads)[2] = str_replace(colnames(carloads)[2], 'CN', 'CNI')
-colnames(carloads)[5] = str_replace(colnames(carloads)[5], 'KCS', 'KSU')
-colnames(carloads)[6] = str_replace(colnames(carloads)[6], 'NS', 'NSC')
-colnames(carloads)[7] = str_replace(colnames(carloads)[7], 'UP', 'UNP') #Change column names to be consistent with stock tickers
+colnames(carloads_temp) = carloads_temp[1, ]
+colnames(carloads_temp)[2] = str_replace(colnames(carloads_temp)[2], 'CN', 'CNI')
+colnames(carloads_temp)[5] = str_replace(colnames(carloads_temp)[5], 'KCS', 'KSU')
+colnames(carloads_temp)[6] = str_replace(colnames(carloads_temp)[6], 'NS', 'NSC')
+colnames(carloads_temp)[7] = str_replace(colnames(carloads_temp)[7], 'UP', 'UNP') #Change column names to be consistent with stock tickers
 
-carloads = carloads[-1, ]
-carloads = as.data.frame(carloads) #Convert back to data frame since it's a matrix currently
-for (i in 1:ncol(carloads)) {
-  carloads[, i] = as.numeric(carloads[, i])
+carloads_temp = carloads_temp[-1, ]
+carloads_temp = as.data.frame(carloads_temp) #Convert back to data frame since it's a matrix currently
+for (i in 1:ncol(carloads_temp)) {
+  carloads_temp[, i] = as.numeric(carloads_temp[, i])
 } #Convert columns to numeric type 
 
 #Final clean up of carloads data to stack by railroad
 carloads_final = data.frame(Name = c(), Date = c(), Carloads = c())
-for (i in 1:ncol(carloads)) {
-  temp = data.frame(Name = rep(colnames(carloads)[i], nrow(carloads)), 
-                    Date = as.Date(rownames(carloads)),
-                    Carloads = carloads[, i])
+for (i in 1:ncol(carloads_temp)) {
+  temp = data.frame(Name = rep(colnames(carloads_temp)[i], nrow(carloads_temp)), 
+                    Date = as.Date(rownames(carloads_temp)),
+                    Carloads = carloads_temp[, i])
   carloads_final = rbind(carloads_final, temp)
 }
 carloads_final$Date = carloads_final$Date - 5 #Subtract 5 days to be consistent with stocks data below
 
+#Supplementary carload data for the intro section
+carloads_type = carloads %>%
+  filter(Measure == 'Weekly Carloads By 22 Commodity Categories' & carloads$Sub.Variable == 'Total') %>%
+  group_by(Variable) %>%
+  summarize_at(vars(6:(ncol(carloads)-1)), sum) %>%
+  select(-1) %>%
+  rowSums()
+
+carloads_name = carloads %>%
+  filter(Measure == 'Weekly Carloads By 22 Commodity Categories' & carloads$Sub.Variable == 'Total') %>%
+  group_by(Variable) %>%
+  summarize_at(vars(6:(ncol(carloads)-1)), sum) %>%
+  select(1)
+
+carloads_by_type = data.frame(Segment = carloads_name, Total = carloads_type)
+
 #Load stock prices
-start = as.Date(rownames(carloads)[1])
-end = as.Date(rownames(carloads)[nrow(carloads)])
+start = as.Date(rownames(carloads_temp)[1])
+end = as.Date(rownames(carloads_temp)[nrow(carloads_temp)])
 getSymbols(c('^GSPC', 'IYT', 'XLI', 'CSX', 'CNI', 'CP', 'KSU', 'NSC', 'UNP'), 
            from = start - 5, to = end - 5, return.class = 'data.frame')
 
@@ -148,7 +165,7 @@ GDP_final = GDP_final %>%
   group_by(Date) %>%
   summarize(GDP = sum(GDP))
 
-carloads_GDP = carloads %>% rownames_to_column() %>% 
+carloads_GDP = carloads_temp %>% rownames_to_column() %>% 
   mutate(Total = BNSF + CNI + CP + CSX + KSU + NSC + UNP) %>%
   rename(Date = rowname) %>%
   mutate(Date = str_c(format(as.Date(Date), '%y'), quarters(as.Date(Date)))) %>%
@@ -172,7 +189,7 @@ ISM[, 2] = as.numeric(ISM[, 2]) * 100
 ISM[, 1] = as.Date(ISM[, 1], '%m/%d/%Y')
 
 
-carloads_ISM = carloads %>% rownames_to_column() %>% 
+carloads_ISM = carloads_temp %>% rownames_to_column() %>% 
   mutate(Total = BNSF + CNI + CP + CSX + KSU + NSC + UNP) %>%
   rename(Date = rowname) %>%
   mutate(Date = as.Date(format(as.Date(Date), '%Y-%m-01'))) %>%
@@ -188,3 +205,15 @@ ISM_bear = ISM %>% filter(Last < 50) %>% select(Date)
 scale_ci = (max(carloads_ISM[-1, ]$Total) - min(carloads_ISM[-1, ]$Total)) / 
   (max(carloads_ISM[-1, ]$Last) - min(carloads_ISM[-1, ]$Last))  
 translation_ci = min(carloads_ISM[-1, ]$Total)
+
+#ISM vs. GDP data
+ISMGDP = ISM %>%
+  mutate(Date = str_c(format(Date, '%y'), quarters(Date))) %>%
+  group_by(Date) %>%
+  summarize(ISM = mean(Last)) %>%
+  inner_join(GDP_final, by = 'Date')
+
+#Variables to scale the second axis of ISM vs. GDP plot
+scale_ig = (max(ISMGDP$ISM) - min(ISMGDP$ISM)) / 
+  (max(ISMGDP$GDP) - min(ISMGDP$GDP))  
+translation_ig = min(ISMGDP$ISM)
