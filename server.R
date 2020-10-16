@@ -19,7 +19,7 @@ function(input, output) {
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Railcarloads (Red) vs. ISM Manufacturing Index (Blue)')
+      ggtitle('Rail carloads (Red) vs. ISM Manufacturing Index (Blue)')
   )
   
   #Intro section: Rail carloads. vs. GDP plot
@@ -40,7 +40,7 @@ function(input, output) {
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
             axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Railcarloads (Red) vs. US GDP (Blue)')
+      ggtitle('Rail Carloads (Red) vs. US GDP (Blue)')
     )
   
   #Create a reactive df for the Rails section
@@ -56,7 +56,7 @@ function(input, output) {
       geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Price - min(Price, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
-                      (max(Price, na.rm = T) - min(Price, na.rm = T))) + (min(Carloads) - min(Price, na.rm = T)),
+                      (max(Price, na.rm = T) - min(Price, na.rm = T))) + min(Carloads),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
@@ -65,7 +65,7 @@ function(input, output) {
         sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                   (max(df_reactive()$Price, na.rm = T) - min(df_reactive()$Price, na.rm = T))) + 
                               min(df_reactive()$Price, na.rm = T) - 
-                              (min(df_reactive()$Carloads) - min(df_reactive()$Price, na.rm = T)) / 
+                              min(df_reactive()$Carloads) / 
                               ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                  (max(df_reactive()$Price, na.rm = T) - min(df_reactive()$Price, na.rm = T))), 
                             name = 'Stock Price', 
@@ -92,7 +92,7 @@ function(input, output) {
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
                ymin = min(df_reactive()$Carloads), ymax = max(df_reactive()$Carloads),
                alpha = 0.2, fill = 'darkred')
-    )
+  )
   
   #Rails section: Rail analysis vs. IYT
   output$RelToIYT = renderPlot(
@@ -102,7 +102,7 @@ function(input, output) {
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.IYT - min(Relative.To.IYT, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
                         (max(Relative.To.IYT, na.rm = T) - min(Relative.To.IYT, na.rm = T))) + 
-                        (min(Carloads) - min(Relative.To.IYT, na.rm = T)),
+                        min(Carloads),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
@@ -111,7 +111,7 @@ function(input, output) {
         sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                   (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))) + 
                               min(df_reactive()$Relative.To.IYT, na.rm = T) - 
-                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.IYT, na.rm = T)) / 
+                              min(df_reactive()$Carloads) / 
                               ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                  (max(df_reactive()$Relative.To.IYT, na.rm = T) - min(df_reactive()$Relative.To.IYT, na.rm = T))), 
                             name = 'Stock Price / IYT')
@@ -147,7 +147,7 @@ function(input, output) {
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.XLI - min(Relative.To.XLI, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
                         (max(Relative.To.XLI, na.rm = T) - min(Relative.To.XLI, na.rm = T))) + 
-                        (min(Carloads) - min(Relative.To.XLI, na.rm = T)),
+                        min(Carloads),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
@@ -156,7 +156,7 @@ function(input, output) {
         sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                   (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))) + 
                               min(df_reactive()$Relative.To.XLI, na.rm = T) - 
-                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.XLI, na.rm = T)) / 
+                              min(df_reactive()$Carloads) / 
                               ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                  (max(df_reactive()$Relative.To.XLI, na.rm = T) - min(df_reactive()$Relative.To.XLI, na.rm = T))), 
                             name = 'Stock Price / XLI')
@@ -192,7 +192,7 @@ function(input, output) {
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.SPY - min(Relative.To.SPY, na.rm = T)) * ((max(Carloads) - min(Carloads)) / 
                         (max(Relative.To.SPY, na.rm = T) - min(Relative.To.SPY, na.rm = T))) + 
-                        (min(Carloads) - min(Relative.To.SPY, na.rm = T)),
+                        min(Carloads),
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'Total Carloads',
@@ -201,7 +201,7 @@ function(input, output) {
         sec.axis = sec_axis(~./((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                   (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))) + 
                               min(df_reactive()$Relative.To.SPY, na.rm = T) - 
-                              (min(df_reactive()$Carloads) - min(df_reactive()$Relative.To.SPY, na.rm = T)) / 
+                              min(df_reactive()$Carloads) / 
                               ((max(df_reactive()$Carloads) - min(df_reactive()$Carloads)) / 
                                  (max(df_reactive()$Relative.To.SPY, na.rm = T) - min(df_reactive()$Relative.To.SPY, na.rm = T))), 
                             name = 'Stock Price / S&P500')
@@ -229,18 +229,18 @@ function(input, output) {
                alpha = 0.2, fill = 'darkred')
     )
   
-  #USCAD section: US rails vs. Canadian rails
-  output$uscad.analysis = renderPlot(
+  #USCAD section: US rails vs. Canadian rails Chart 1 (relative carloads vs. relative stock price )
+  output$uscad.analysis1 = renderPlot(
     df_USCAD %>%
       ggplot(aes(x = Date)) + 
       geom_line(aes(y = Relative.Carloads, group = 1), color = 'red', size = 1.5) +
       #axis transformation 
-      geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc + translation_uc,
+      geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc1 + translation_uc1,
                     group = 1), color = 'blue', size = 1.5) +
       scale_y_continuous(
         name = 'US carloads / Canadian carloads',
         #axis transformation 
-        sec.axis = sec_axis(~./scale_uc + min(df_USCAD$Relative.Price, na.rm = T) - translation_uc / scale_uc, 
+        sec.axis = sec_axis(~./scale_uc1 + min(df_USCAD$Relative.Price, na.rm = T) - translation_uc1 / scale_uc1, 
                             name = 'US Rail Stock Price / Canadian Rail Stock Price')
       ) +
       scale_x_date(breaks = '3 months') +
@@ -264,5 +264,59 @@ function(input, output) {
       annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
                ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
                alpha = 0.2, fill = 'darkred')
+    )
+  
+  #USCAD section: US rails vs. Canadian rails Chart 1 (relative YoY vs. relative stock price )
+  output$uscad.analysis2 = renderPlot(
+    df_USCAD %>%
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Relative.YoY, group = 1), color = 'red', size = 1.5) +
+      #axis transformation 
+      geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc2 + translation_uc2,
+                    group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'YoY change in US carloads - YoY change in Canadian carloads',
+        #axis transformation 
+        sec.axis = sec_axis(~./scale_uc2 + min(df_USCAD$Relative.Price, na.rm = T) - translation_uc2 / scale_uc2, 
+                            name = 'US Rail Stock Price / Canadian Rail Stock Price')
+      ) +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      ggtitle('YoY US Carloads less YoY Canadian Carloads (Red) vs. Relative Stock Price (Blue)') +
+      annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
+               ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
+               alpha = 0.2, fill = 'darkgreen') + 
+      annotate('rect', xmin = as.Date('2020-01-01'), xmax = as.Date('2020-02-29'),
+               ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2020-06-01'), xmax = max(df_USCAD$Date),
+               ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
+               alpha = 0.2, fill = 'darkgreen') +
+      annotate('rect', xmin = as.Date('2019-08-01'), xmax = as.Date('2019-12-31'),
+               ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
+               alpha = 0.2, fill = 'darkred') +
+      annotate('rect', xmin = as.Date('2020-03-01'), xmax = as.Date('2020-05-31'),
+               ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
+               alpha = 0.2, fill = 'darkred')
+    )
+  
+  #Conclusion section: Rail vs. SPY over time
+  colnames(stocks)
+  output$railhistory = renderPlot(
+    stocks_final %>%
+      ggplot(aes(x = Date, y = Relative.To.SPY)) +
+      geom_line(aes(color = Name), size = 1.5) +
+      scale_y_continuous(
+        name = 'Stock price relative to S&P500') +
+      scale_x_date(breaks = '3 months') +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+      labs(color = 'Stock') +
+      ggtitle('Rail Stock Prices Relative to S&P 500 Over Time')
     )
   }

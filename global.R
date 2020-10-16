@@ -107,25 +107,34 @@ temp_NSC = df_main %>% filter(Name == 'NSC') %>% select(2:4)
 temp_UNP = df_main %>% filter(Name == 'UNP') %>% select(2:4)
 df_US = inner_join(inner_join(temp_CSX, temp_NSC, by = 'Date'), temp_UNP, by = 'Date')
 df_US = df_US %>% 
-  mutate(Carloads = Carloads.x + Carloads.y + Carloads, Price = (Price.x + Price.y + Price) / 3) %>%
-  select(Date, Carloads, Price)
+  mutate(Carloads_US = Carloads.x + Carloads.y + Carloads, 
+         Price_US = (Price.x + Price.y + Price) / 3,
+         YoY_US = Carloads_US / lag(Carloads_US, 52) - 1) %>%
+  select(Date, Carloads_US, Price_US, YoY_US)
 
 temp_CNI = df_main %>% filter(Name == 'CNI') %>% select(2:4)
 temp_CP = df_main %>% filter(Name == 'CP') %>% select(2:4)
 df_CAD = inner_join(temp_CNI, temp_CP, by = 'Date')
 df_CAD = df_CAD %>%
-  mutate(Carloads = Carloads.x + Carloads.y, Price = (Price.x + Price.y) / 2) %>%
-  select(Date, Carloads, Price)
+  mutate(Carloads_CAD = Carloads.x + Carloads.y, 
+         Price_CAD = (Price.x + Price.y) / 2, 
+         YoY_CAD = Carloads_CAD / lag(Carloads_CAD, 52) - 1) %>%
+  select(Date, Carloads_CAD, Price_CAD, YoY_CAD)
 
 df_USCAD = inner_join(df_US, df_CAD, by = 'Date')
 df_USCAD = df_USCAD %>%
-  mutate(Relative.Carloads = Carloads.x / Carloads.y, Relative.Price = Price.x / Price.y) %>%
-  select(Date, Relative.Carloads, Relative.Price)
+  mutate(Relative.Carloads = Carloads_US / Carloads_CAD, 
+         Relative.Price = Price_US / Price_CAD, 
+         Relative.YoY = YoY_US - YoY_CAD) %>%
+  select(Date, Relative.Carloads, Relative.Price, Relative.YoY)
 
 #Variables to scale the second axis of US rails vs. Canadian rails analysis
-scale_uc = (max(df_USCAD$Relative.Carloads) - min(df_USCAD$Relative.Carloads)) / 
+scale_uc1 = (max(df_USCAD$Relative.Carloads) - min(df_USCAD$Relative.Carloads)) / 
   (max(df_USCAD$Relative.Price, na.rm = T) - min(df_USCAD$Relative.Price, na.rm = T))  
-translation_uc = min(df_USCAD$Relative.Carloads) - min(df_USCAD$Relative.Price, na.rm = T)
+translation_uc1 = min(df_USCAD$Relative.Carloads)
+scale_uc2 = (max(df_USCAD$Relative.YoY, na.rm = T) - min(df_USCAD$Relative.YoY, na.rm = T)) / 
+  (max(df_USCAD$Relative.Price, na.rm = T) - min(df_USCAD$Relative.Price, na.rm = T))  
+translation_uc2 = min(df_USCAD$Relative.YoY, na.rm = T)
 
 #Pull GDP data for the Intro section and cbind with carloads
 getSymbols('GDP', src = 'FRED')
@@ -151,7 +160,7 @@ carloads_GDP = carloads %>% rownames_to_column() %>%
 #Variables to scale the second axis of carloads vs. GDP plot
 scale_cg = (max(carloads_GDP[-1, ]$Total) - min(carloads_GDP[-1, ]$Total)) / 
   (max(carloads_GDP[-1, ]$GDP) - min(carloads_GDP[-1, ]$GDP))  
-translation_cg = min(carloads_GDP[-1, ]$Total) - min(carloads_GDP[-1, ]$GDP)
+translation_cg = min(carloads_GDP[-1, ]$Total)
 
 #ISM data analysis
 ISM = read.csv('C:/Users/hk486/OneDrive/Desktop/NYDSA/Bootcamp/Projects/Shiny/Rails/ISM.csv') 
@@ -178,4 +187,4 @@ ISM_bear = ISM %>% filter(Last < 50) %>% select(Date)
 #Variables to scale the second axis of carloads vs. ISM plot
 scale_ci = (max(carloads_ISM[-1, ]$Total) - min(carloads_ISM[-1, ]$Total)) / 
   (max(carloads_ISM[-1, ]$Last) - min(carloads_ISM[-1, ]$Last))  
-translation_ci = min(carloads_ISM[-1, ]$Total) - min(carloads_ISM[-1, ]$Last)
+translation_ci = min(carloads_ISM[-1, ]$Total)
