@@ -1,18 +1,18 @@
 
 function(input, output) {
-  #Intro section: Rail carload plot
+  #Intro section: Rail carload mix plot
   output$rails = renderPlot(
     carloads_by_type %>%
-      ggplot(aes(x = 1, y = Total)) +
-      geom_col(aes(fill = Variable), position = 'fill', color = 'black') +
-      scale_y_continuous(name = '% of Total Carloads', labels = percent) +
+      ggplot(aes(x = reorder(Variable, Total / sum(Total)), y = Total / sum(Total))) +
+      geom_col() +
+      scale_y_continuous(name = '% of Total Carloads', label = percent) +
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_blank(), plot.title = element_text(size = 20)) +
-      xlab(NULL) +
+            plot.title = element_text(size = 20)) +
+      xlab("Carload Type") +
       labs(fill = 'Carload Type') +
-      scale_color_gradient(low = 'red', high = 'yellow') +
+      coord_flip() +
       ggtitle('Rail Carload Mix')
   )
   

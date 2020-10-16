@@ -61,9 +61,20 @@ dashboardPage(
                        )
               ),
       tabItem(tabName = "rails", 
-              fluidRow(selectizeInput("rail_selected", 
-                                      "Which Rail? (BNSF is private so will only show carloads)", 
-                                      unique(df_main$Name))),
+              fluidRow(box(column(width = 6, 
+                                  selectizeInput("rail_selected", 
+                                                 "Which Rail? (BNSF is private so will only show carloads)", 
+                                                 unique(df_main$Name))
+                                  ),
+                           column(width = 6,
+                                  selectizeInput("ma", 
+                                                 "Moving Average (1 = default, 4 = 1 month, 
+                                                 12 = 1 quarter, 52 = 1 year)", 
+                                                 c(1, 4, 12, 52))
+                                  ), 
+                           width = 12
+                           )
+                       ),
               fluidRow(h2("Single Rail Analysis"),
                        "Green area: ISM >= 50, Red area: ISM < 50",
                        box(plotOutput('RelToSelf'), width = 12)),
