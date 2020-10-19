@@ -18,7 +18,7 @@ dashboardPage(
     tabItems(
       tabItem(tabName = "intro", 
               fluidRow(h2("Background on Rails"), 
-                      box("If Warren Buffet were stuck in a deserted island and could only have
+                      box("If Warren Buffet were stuck on a deserted island and could only have
                           access to one economic indicator, he was quoted to choose rail carloads (he owns 
                           Burlington Northern, one of the largest railroads in the US). While  
                           rails only constitute mid-single-digit percentage of the US transportation 
@@ -36,7 +36,7 @@ dashboardPage(
               fluidRow(h2("Economic Relationship"), 
                        box("Consistent with Buffet's claims, the plot below shows a clear relationship between
                           rail carloads and ISM Manufacturing Index, which is one of the most important metrics
-                          for the US economy. ISM is a monthly survey that measures purchasing manager sentiment
+                          for the US economy. ISM is a monthly survey that measures purchasing managers' sentiment
                            at more than 300 companies.", 
                           plotOutput('CarloadISM'), 
                           br(), 
