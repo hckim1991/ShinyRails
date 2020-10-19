@@ -9,7 +9,9 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            plot.title = element_text(size = 20)) +
+            plot.title = element_text(size = 25, face = 'bold'), axis.text.y = element_text(face = 'bold'), 
+            axis.text.x = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
       xlab("Carload Type") +
       labs(fill = 'Carload Type') +
       coord_flip() +
@@ -34,30 +36,11 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'),
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'),
+            axis.title.x = element_text(face = 'bold')) +
       ggtitle('Rail carloads (Red) vs. ISM Manufacturing Index (Blue)')
   )
-  
-  #Intro section: Rail carloads. vs. GDP plot
-  output$CarloadGDP = renderPlot(
-    carloads_GDP[-1, ] %>% #Skip 1st row since 1Q17 has incomplete data. 
-      ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Total, group = 1), color = 'red', size = 1.5) +
-      #axis transformation
-      geom_line(aes(y = (GDP - min(GDP)) * scale_cg + translation_cg, group = 1), color = 'blue', size = 1.5) +
-      scale_y_continuous(
-        name = 'Total Carloads',
-        labels = scientific,
-        #axis transformation
-        sec.axis = sec_axis(~./scale_cg + min(carloads_GDP[-1, ]$GDP) - translation_cg / scale_cg, 
-                            name = 'US GDP ($ bn)')
-      ) +
-      theme_bw() +
-      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
-            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Rail Carloads (Red) vs. US GDP (Blue)')
-    )
   
   #Intro section: ISM vs. GDP
   output$ISMGDP = renderPlot(
@@ -76,10 +59,36 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
       ggtitle('ISM (Red) vs. US GDP (Blue)')
     )
   
+  #Intro section: Rail carloads. vs. GDP plot
+  output$CarloadGDP = renderPlot(
+    carloads_GDP[-1, ] %>% #Skip 1st row since 1Q17 has incomplete data. 
+      ggplot(aes(x = Date)) + 
+      geom_line(aes(y = Total, group = 1), color = 'red', size = 1.5) +
+      #axis transformation
+      geom_line(aes(y = (GDP - min(GDP)) * scale_cg + translation_cg, group = 1), color = 'blue', size = 1.5) +
+      scale_y_continuous(
+        name = 'Total Carloads',
+        labels = scientific,
+        #axis transformation
+        sec.axis = sec_axis(~./scale_cg + min(carloads_GDP[-1, ]$GDP) - translation_cg / scale_cg, 
+                            name = 'US GDP ($ bn)')
+      ) +
+      theme_bw() +
+      theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
+            panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'),
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Rail Carloads (Red) vs. US GDP (Blue)')
+    )
+  
+ 
   #Create a reactive df for the Rails section
   df_reactive = reactive(
     df_main_reactive %>%
@@ -93,7 +102,7 @@ function(input, output, session) {
   output$RelToSelf = renderPlot(
     df_reactive() %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Carloads, group = 1), color = 'black', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Price - min(Price, na.rm = T)) * ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
                       (max(Price, na.rm = T) - min(Price, na.rm = T))) + min(Carloads, na.rm = T),
@@ -115,8 +124,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Carloads (Red) vs. Stock Price (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Carloads (Black) vs. Stock Price (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -138,7 +149,7 @@ function(input, output, session) {
   output$RelToIYT = renderPlot(
     df_reactive() %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Carloads, group = 1), color = 'black', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.IYT - min(Relative.To.IYT, na.rm = T)) *
                       ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
@@ -161,8 +172,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Carloads (Red) vs. Stock Price/IYT (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Carloads (Black) vs. Stock Price/IYT (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -186,7 +199,7 @@ function(input, output, session) {
   output$RelToXLI = renderPlot(
     df_reactive() %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Carloads, group = 1), color = 'black', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.XLI - min(Relative.To.XLI, na.rm = T)) * 
                       ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
@@ -209,8 +222,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Carloads (Red) vs. Stock Price/XLI (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Carloads (Black) vs. Stock Price/XLI (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -234,7 +249,7 @@ function(input, output, session) {
   output$RelToSPY = renderPlot(
     df_reactive() %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Carloads, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Carloads, group = 1), color = 'black', size = 1.5) +
       #axis transformation (more complicated since it's reactive but the concept is the same)
       geom_line(aes(y = (Relative.To.SPY - min(Relative.To.SPY, na.rm = T)) * 
                       ((max(Carloads, na.rm = T) - min(Carloads, na.rm = T)) / 
@@ -257,8 +272,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Carloads (Red) vs. Stock Price/S&P500 (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Carloads (Black) vs. Stock Price/S&P500 (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_reactive()$Carloads, na.rm = T), ymax = max(df_reactive()$Carloads, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -280,7 +297,7 @@ function(input, output, session) {
   output$uscad.analysis1 = renderPlot(
     df_USCAD %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Relative.Carloads, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Relative.Carloads, group = 1), color = 'black', size = 1.5) +
       #axis transformation 
       geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc1 + translation_uc1,
                     group = 1), color = 'blue', size = 1.5) +
@@ -294,8 +311,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('Relative Carloads (Red) vs. Relative Stock Price (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('Relative Carloads (Black) vs. Relative Stock Price (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_USCAD$Relative.Carloads), ymax = max(df_USCAD$Relative.Carloads),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -317,7 +336,7 @@ function(input, output, session) {
   output$uscad.analysis2 = renderPlot(
     df_USCAD %>%
       ggplot(aes(x = Date)) + 
-      geom_line(aes(y = Relative.YoY, group = 1), color = 'red', size = 1.5) +
+      geom_line(aes(y = Relative.YoY, group = 1), color = 'black', size = 1.5) +
       #axis transformation 
       geom_line(aes(y = (Relative.Price - min(Relative.Price, na.rm = T)) * scale_uc2 + translation_uc2,
                     group = 1), color = 'blue', size = 1.5) +
@@ -332,8 +351,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
-      ggtitle('YoY US Carloads less YoY Canadian Carloads (Red) vs. Relative Stock Price (Blue)') +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold')) +
+      ggtitle('YoY US Carloads less YoY Canadian Carloads (Black) vs. Relative Stock Price (Blue)') +
       annotate('rect', xmin = as.Date('2017-03-01'), xmax = as.Date('2019-07-31'),
                ymin = min(df_USCAD$Relative.YoY, na.rm = T), ymax = max(df_USCAD$Relative.YoY, na.rm = T),
                alpha = 0.2, fill = 'darkgreen') + 
@@ -363,7 +384,10 @@ function(input, output, session) {
       theme_bw() +
       theme(panel.grid.major.y = element_blank(), panel.grid.major.x = element_blank(), 
             panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), 
-            axis.text.x = element_text(angle = -45), plot.title = element_text(size = 20)) +
+            axis.text.x = element_text(angle = -45, face = 'bold'), plot.title = element_text(size = 25, face = 'bold'), 
+            axis.text.y = element_text(face = 'bold'), axis.title.y = element_text(face = 'bold'), 
+            axis.title.x = element_text(face = 'bold'), legend.text = element_text(face = 'bold'), 
+            legend.title = element_text(face = 'bold')) +
       labs(color = 'Stock') +
       scale_color_brewer(palette = 'Accent') +
       ggtitle('Rail Stock Prices Relative to S&P 500 Over Time')
