@@ -37,7 +37,8 @@ dashboardPage(
                        box("Consistent with Buffet's claims, the plot below shows a clear relationship between
                           rail carloads and ISM Manufacturing Index, which is one of the most important metrics
                           for the US economy. ISM is a monthly survey that measures purchasing managers' sentiment
-                           at more than 300 companies.", 
+                           at more than 300 companies. ISM >= 50 implies US economy is healthy while ISM < 50 implies
+                           US economy is weak.", 
                           plotOutput('CarloadISM'), 
                           br(), 
                           "The chart below shows that ISM is a great leading indicator of US GDP.",
@@ -54,7 +55,7 @@ dashboardPage(
                        box("Given the importance of rails to the US economy, it is no surprise that the rail stocks
                            have a wide investor base.", tags$u(tags$b("The goal of this project is to identify trading 
                            opportunities based on the relationship between carloads and rail stock prices under 
-                           different macro environment.")), "This is a common analysis hedge funds do on the rails
+                           different macro environments.")), "This is a common analysis hedge funds do on the rails
                            and this web app will automate the analysis.", 
                            width = 12), 
                        br()
@@ -129,9 +130,10 @@ dashboardPage(
                                        tags$li("In the west, both UNP and KSU seem rich but KSU is a better value."),
                                        tags$li(tags$u(tags$b("Out of all the rails, CSX seems to be the best value.")))
                                        )
-                                     ),
+                                     )
                              ),
-                           br(),
+                           "Final caveat is that while carloads explain the majority of rail stock price movement
+                           in the long run, other exogenous factors could drive the stock prices in the near term.", 
                            width = 12))
               ),
       tabItem(tabName = "aboutme", 
@@ -144,7 +146,7 @@ dashboardPage(
                                 the US equity market, where he spent 7 years in the hedge fund industry investing
                                 in the industrials sector (specifically automobile and transportation companies).
                                 He hopes to complement his investing skillsets with data science to become a better
-                                investor and find unqiue ways to outperform the ever more competitive stock market.", 
+                                investor and find unique ways to outperform the ever more competitive stock market.", 
                                 br(), 
                                 br(), 
                                 tags$b("LinkedIn: "), 
